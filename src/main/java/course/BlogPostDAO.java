@@ -4,6 +4,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 
 import java.util.ArrayList;
@@ -97,5 +100,11 @@ public class BlogPostDAO {
         // - email is optional and may come in NULL. Check for that.
         // - best solution uses an update command to the database and a suitable
         //   operator to append the comment on to any existing list of comments
+        Document post = new Document("author", name).append("body", body);
+        if(StringUtils.isNotEmpty(email))
+        {
+            post.append("email", email);
+        }
+        postsCollection.updateOne(Filters.eq("permalink", permalink), Updates.push("comments", post), new UpdateOptions().upsert(true));
     }
 }

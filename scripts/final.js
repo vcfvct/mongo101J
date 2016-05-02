@@ -2,7 +2,8 @@
 db.messages.find({ 'headers.From': 'andrew.fastow@enron.com', 'headers.To': 'jeff.skilling@enron.com' }).count()
 
 
-//Final 2, use $addToSet to remove dups from the 'headers.To' list
+// Final 2, use $addToSet to remove dups from the 'headers.To' list
+// if the collection is to large, we could add '{allowDiskUse:true}' as the 2nd param of aggregate() function after the [].
 db.messages.aggregate([{
     $project: { headers: '$headers' }
 }, {

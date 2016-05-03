@@ -23,3 +23,36 @@ db.messages.aggregate([{
 
 //Final 3
 db.messages.update({'headers.Message-ID': '<8147308.1075851042335.JavaMail.evans@thyme>'}, {$push: {'headers.To': 'mrpotatohead@mongodb.com'}})
+
+
+//Finra 7 --- import
+mongoimport -d final7 -c albums <albums.json --batchSize 1 
+mongoimport -d final7 -c images <images.json --batchSize 1
+
+//Finra 7 --- code. Execute with 'mongo FileName.js'
+var dbString = '127.0.0.1:27017/final7';
+var db = connect(dbString);
+print('* Connected to the ' + dbString);
+
+var albums = db.albums.find();
+var validImages = {};
+albums.forEach(function(album){
+	album.images.forEach(function(imageId){
+		if(!validImages[imageId]){
+			validImages[imageId] = 1;
+		}
+	});
+});
+
+var targetImages = db.images.find({tags: {$in: ['sunrises']}});
+var orphanCount = 0;
+var totalCount = 0;
+targetImages.forEach(function(image){
+	totalCount++;
+	if(!validImages[image._id]){
+		orphanCount++;
+	}
+});
+print('Total images with sunrises: ' + totalCount);
+print('Total Orphan images with sunrises: ' + orphanCount);
+print('Finra 7 answer: ' + (totalCount - orphanCount));
